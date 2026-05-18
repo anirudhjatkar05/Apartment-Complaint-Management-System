@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Complaint</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial;
+        }
+
+        body{
+            background:#0f172a;
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:20px;
+        }
+
+        .container{
+            width:100%;
+            max-width:600px;
+            background:#1e293b;
+            padding:30px;
+            border-radius:15px;
+            box-shadow:0 0 20px rgba(0,0,0,0.4);
+        }
+
+        h1{
+            color:white;
+            margin-bottom:20px;
+            text-align:center;
+        }
+
+        .form-group{
+            margin-bottom:20px;
+        }
+
+        label{
+            color:white;
+            display:block;
+            margin-bottom:8px;
+        }
+
+        input,
+        textarea,
+        select{
+            width:100%;
+            padding:12px;
+            border:none;
+            border-radius:8px;
+            background:#334155;
+            color:white;
+            font-size:15px;
+        }
+
+        textarea{
+            resize:none;
+            height:120px;
+        }
+
+        button{
+            width:100%;
+            padding:14px;
+            border:none;
+            border-radius:10px;
+            background:#3b82f6;
+            color:white;
+            font-size:16px;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#2563eb;
+        }
+
+        .success{
+            color:#22c55e;
+            margin-top:15px;
+            text-align:center;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>Submit Complaint</h1>
+
+        <form id="complaintForm">
+
+            <div class="form-group">
+                <label>Complaint Title</label>
+                <input type="text" id="title" required>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Category</label>
+
+                <select id="category">
+
+                    <option>Plumbing</option>
+                    <option>Electricity</option>
+                    <option>Cleaning</option>
+                    <option>Security</option>
+                    <option>Other</option>
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Priority</label>
+
+                <select id="priority">
+
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Apartment Number</label>
+                <input type="text" id="apartmentNumber" required>
+            </div>
+
+            <button type="submit">
+                Submit Complaint
+            </button>
+
+        </form>
+
+        <p class="success" id="successMessage"></p>
+
+    </div>
+
+<script>
+
+const API_BASE = "http://localhost:3000/api";
+
+const complaintForm = document.getElementById("complaintForm");
+
+complaintForm.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const title = document.getElementById("title").value;
+
+    const description = document.getElementById("description").value;
+
+    const category = document.getElementById("category").value;
+
+    const priority = document.getElementById("priority").value;
+
+    const apartmentNumber = document.getElementById("apartmentNumber").value;
+
+    try {
+
+        const response = await fetch(`${API_BASE}/complaints/create`, {
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                title,
+                description,
+                category,
+                priority,
+                apartmentNumber
+
+            })
+
+        });
+
+        const data = await response.json();
+
+        if(data.success){
+
+            document.getElementById("successMessage").innerText =
+            "Complaint Submitted Successfully";
+
+            complaintForm.reset();
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    } catch (error) {
+
+        console.log(error);
+
+        alert("Server Error");
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

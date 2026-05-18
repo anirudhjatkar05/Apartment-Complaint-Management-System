@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Apartment Complaints</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Third aurora orb for asymmetry -->
+    <div class="auth-page">
+        <!-- Left: Hero Section -->
+        <div class="auth-hero">
+            <div class="hero-content">
+                <h2>Welcome Back to Your Home.</h2>
+                <p>Access your resident portal to track complaints, view updates, and connect with management effortlessly.</p>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="value">Fast</span>
+                        <span class="label">Resolution</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="value">Secure</span>
+                        <span class="label">Access</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="value">Direct</span>
+                        <span class="label">Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Auth Form Section -->
+        <div class="auth-main">
+            <div class="card auth-card">
+                <!-- Logo -->
+                <div class="logo">
+                    <div class="logo-icon">🏢</div>
+                    <h1>Apartment Complaints</h1>
+                    <p>Secure login to your resident portal</p>
+                </div>
+
+                <div id="error-alert" class="alert alert-error">Invalid email or password.</div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <input type="email" id="email" placeholder=" " required autocomplete="email">
+                        <label for="email">Email Address</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" placeholder=" " required autocomplete="current-password">
+                        <label for="password">Password</label>
+                    </div>
+                    
+                    <div style="text-align: right; margin-bottom: 25px;">
+                        <a href="forgot_password.html" style="font-size: 0.85rem; color: var(--text-secondary);">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <span>Sign In</span>
+                        <span class="arrow">→</span>
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-text">OR</div>
+                    <div class="divider-line"></div>
+                </div>
+                
+                <div class="footer-link">
+                    Don't have an account? <a href="register.html">Create One</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script>
+        const loginForm = document.getElementById("loginForm");
+        const errorAlert = document.getElementById("error-alert");
+        const loginBtn   = loginForm.querySelector("button[type='submit']");
+
+        function showError(msg) {
+            errorAlert.textContent = "⚠️ " + msg;
+            errorAlert.classList.add("show");
+        }
+        function clearError() {
+            errorAlert.classList.remove("show");
+        }
+
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            clearError();
+
+            const email    = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+
+            // Button loading state
+            const originalContent = loginBtn.innerHTML;
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="spinner"></span>Signing in...';
+
+            try {
+                const response = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("currentUser", JSON.stringify(data.user));
+
+                    loginBtn.innerHTML = '<span class="spinner"></span>Redirecting...';
+
+                    if (data.user.role === "ADMIN") {
+                        window.location.href = "admin_dashboard.html";
+                    } else if (data.user.role === "STAFF") {
+                        window.location.href = "staff_dashboard.html";
+                    } else {
+                        window.location.href = "user_dashboard.html";
+                    }
+                } else {
+                    showError(data.message || "Login failed. Please try again.");
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = originalContent;
+                }
+
+            } catch (error) {
+                console.error(error);
+                showError("Cannot reach server. Make sure backend is running.");
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = originalContent;
+            }
+        });
+    </script>
+</body>
+</html>

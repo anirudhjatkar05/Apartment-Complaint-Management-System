@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Apartment Complaints</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-page">
+        <!-- Left: Hero Section -->
+        <div class="auth-hero">
+            <div class="hero-content">
+                <h2>Manage Your Apartment with Ease.</h2>
+                <p>Join thousands of residents who trust us for seamless complaint management and maintenance tracking.</p>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="value">10k+</span>
+                        <span class="label">Residents</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="value">99%</span>
+                        <span class="label">Resolution</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="value">24/7</span>
+                        <span class="label">Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Auth Form Section -->
+        <div class="auth-main">
+            <div class="card auth-card">
+                <!-- Logo -->
+                <div class="logo">
+                    <div class="logo-icon">🏢</div>
+                    <h1>Apartment Complaints</h1>
+                    <p>Create your secure resident account</p>
+                </div>
+
+                <!-- Steps Indicator -->
+                <div class="steps">
+                    <div class="step-line"><div class="step-line-progress" id="step-progress"></div></div>
+                    <div class="step active" id="step-indicator-1">
+                        <div class="step-circle" id="circle-1">1</div>
+                        <div class="step-label">Details</div>
+                    </div>
+                    <div class="step" id="step-indicator-2">
+                        <div class="step-circle" id="circle-2">2</div>
+                        <div class="step-label">Verify</div>
+                    </div>
+                    <div class="step" id="step-indicator-3">
+                        <div class="step-circle" id="circle-3">✓</div>
+                        <div class="step-label">Done</div>
+                    </div>
+                </div>
+
+                <!-- STEP 1: Details -->
+                <div class="form-section active" id="step1">
+                    <h2 class="section-title">Personal Details</h2>
+                    <p class="section-sub">Please enter your information to begin</p>
+
+                    <div id="alert-step1" class="alert"></div>
+
+                    <form id="registerForm" novalidate>
+                        <div class="form-group">
+                            <input type="text" id="name" placeholder=" " autocomplete="name" required>
+                            <label for="name">Full Name</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" placeholder=" " autocomplete="email" required>
+                            <label for="email">Gmail Address</label>
+                            <p class="hint" id="email-hint">Must be a valid @gmail.com address</p>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" id="password" placeholder=" " autocomplete="new-password" required>
+                            <label for="password">Create Password</label>
+                        </div>
+                        <button type="submit" class="btn-primary" id="register-btn">
+                            <span>Get Started</span>
+                            <span class="arrow">→</span>
+                        </button>
+                    </form>
+
+                    <div class="divider">
+                        <div class="divider-line"></div>
+                        <div class="divider-text">OR</div>
+                        <div class="divider-line"></div>
+                    </div>
+                    
+                    <div class="footer-link">
+                        Already registered? <a href="login.html">Sign In</a>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Verify -->
+                <div class="form-section" id="step2">
+                    <h2 class="section-title">Verify Email</h2>
+                    <p class="section-sub">We've sent a code to <br><strong id="email-display" style="color:var(--accent-primary)"></strong></p>
+
+                    <div id="alert-step2" class="alert"></div>
+
+                    <form id="otpForm" novalidate>
+                        <div class="otp-inputs" id="otp-inputs">
+                            <input type="text" maxlength="1" inputmode="numeric" id="otp0">
+                            <input type="text" maxlength="1" inputmode="numeric" id="otp1">
+                            <input type="text" maxlength="1" inputmode="numeric" id="otp2">
+                            <input type="text" maxlength="1" inputmode="numeric" id="otp3">
+                            <input type="text" maxlength="1" inputmode="numeric" id="otp4">
+                            <input type="text" maxlength="1" inputmode="numeric" id="otp5">
+                        </div>
+                        <button type="submit" class="btn-primary" id="verify-btn">Verify Account</button>
+                    </form>
+
+                    <div class="resend-row">
+                        <span>Didn't get the code?</span>
+                        <button id="resend-btn" onclick="resendOtp()">Resend</button>
+                    </div>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <a href="#" onclick="goBack()" style="color: var(--text-secondary); font-size: 0.9rem;">← Back to details</a>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Done -->
+                <div class="form-section" id="step3" style="text-align:center;">
+                    <div style="font-size:70px; margin-bottom:20px; animation: bounce 2s infinite;">🎉</div>
+                    <h2 class="section-title">Verification Successful!</h2>
+                    <p class="section-sub">Welcome aboard! Your account is now active and ready to use.</p>
+                    <a href="login.html" class="btn-primary">Go to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script>
+        const API_BASE = "/api";
+
+// Register API
+async function register(name, email, password) {
+
+    try {
+
+        const response = await fetch(`${API_BASE}/register`, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                name,
+                email,
+                password
+            })
+
+        });
+
+        const data = await response.json();
+
+        return data;
+
+    } catch (error) {
+
+        console.log(error);
+
+        return {
+            success: false,
+            message: "Server Error"
+        };
+
+    }
+
+}
+
+// Temporary OTP verification
+async function verifyOtp(email, otp) {
+    try {
+        const response = await fetch(`${API_BASE}/verify`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email,
+                otp
+            })
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.log(error);
+        return {
+            success: false,
+            message: "Server Error"
+        };
+    }
+}
+        let currentEmail = '';
+        let currentName = '';
+        let currentPassword = '';
+
+        // ── Email live validation ──
+        const emailInput = document.getElementById('email');
+        const emailHint = document.getElementById('email-hint');
+        const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
+        emailInput.addEventListener('input', function () {
+            const val = this.value.trim();
+            if (val === '') {
+                emailHint.className = 'hint';
+                emailHint.textContent = 'Must be a valid @gmail.com address';
+                this.classList.remove('error', 'success');
+            } else if (gmailRegex.test(val)) {
+                emailHint.className = 'hint valid';
+                emailHint.textContent = '✓ Valid Gmail address';
+                this.classList.remove('error');
+                this.classList.add('success');
+            } else {
+                emailHint.className = 'hint invalid';
+                emailHint.textContent = '✗ Must be a @gmail.com address';
+                this.classList.remove('success');
+                this.classList.add('error');
+            }
+        });
+
+        // ── Show alert helper ──
+        function showAlert(id, type, msg) {
+            const el = document.getElementById(id);
+            el.className = `alert ${type} show`;
+            el.innerHTML = (type === 'alert-error' ? '⚠️ ' : type === 'alert-success' ? '✅ ' : 'ℹ️ ') + msg;
+        }
+        function hideAlert(id) {
+            document.getElementById(id).className = 'alert';
+        }
+
+        // ── Step navigation ──
+        function goToStep(n) {
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${n}`).classList.add('active');
+
+            const progress = document.getElementById('step-progress');
+            if (n === 1) progress.style.width = '0%';
+            else if (n === 2) progress.style.width = '50%';
+            else if (n === 3) progress.style.width = '100%';
+
+            for (let i = 1; i <= 3; i++) {
+                const step = document.getElementById(`step-indicator-${i}`);
+                const circle = document.getElementById(`circle-${i}`);
+                step.classList.remove('active', 'done');
+                circle.classList.remove('active', 'done');
+                
+                if (i < n) {
+                    step.classList.add('done');
+                } else if (i === n) {
+                    step.classList.add('active');
+                }
+            }
+        }
+
+        function goBack() {
+            goToStep(1);
+            hideAlert('alert-step1');
+        }
+
+        // ── STEP 1: Register ──
+        document.getElementById('registerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            hideAlert('alert-step1');
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!name) return showAlert('alert-step1', 'alert-error', 'Please enter your full name.');
+            if (!gmailRegex.test(email)) return showAlert('alert-step1', 'alert-error', 'Please enter a valid Gmail address (@gmail.com).');
+            if (password.length < 6) return showAlert('alert-step1', 'alert-error', 'Password must be at least 6 characters.');
+
+            const btn = document.getElementById('register-btn');
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Processing...';
+
+            const result = await register(name, email, password);
+            btn.disabled = false;
+            btn.innerHTML = originalContent;
+
+            if (result.success) {
+                currentEmail = email;
+                currentName = name;
+                currentPassword = password;
+                document.getElementById('email-display').textContent = email;
+
+                goToStep(2);
+                document.getElementById('otp0').focus();
+            } else {
+                showAlert('alert-step1', 'alert-error', result.message || 'Something went wrong. Please try again.');
+            }
+        });
+
+        // ── OTP input auto-advance ──
+        document.getElementById('otp-inputs').addEventListener('input', function (e) {
+            if (e.target.tagName !== 'INPUT') return;
+            const inputs = this.querySelectorAll('input');
+            const idx = Array.from(inputs).indexOf(e.target);
+            const val = e.target.value.replace(/[^0-9]/g, '');
+            e.target.value = val;
+            if (val && idx < inputs.length - 1) inputs[idx + 1].focus();
+        });
+
+        document.getElementById('otp-inputs').addEventListener('keydown', function (e) {
+            if (e.target.tagName !== 'INPUT') return;
+            const inputs = this.querySelectorAll('input');
+            const idx = Array.from(inputs).indexOf(e.target);
+            if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+                inputs[idx - 1].focus();
+            }
+        });
+
+        // ── STEP 2: Verify OTP ──
+        document.getElementById('otpForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            hideAlert('alert-step2');
+
+            const inputs = document.querySelectorAll('#otp-inputs input');
+            const otp = Array.from(inputs).map(i => i.value).join('').trim();
+
+            if (otp.length < 6) return showAlert('alert-step2', 'alert-error', 'Please enter the complete 6-digit OTP.');
+
+            const btn = document.getElementById('verify-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Verifying...';
+
+            const result = await verifyOtp(currentEmail, otp);
+            btn.disabled = false;
+            btn.innerHTML = 'Verify Account';
+
+            if (result.success) {
+                goToStep(3);
+            } else {
+                inputs.forEach(i => { i.value = ''; i.classList.add('error'); });
+                inputs[0].focus();
+                setTimeout(() => inputs.forEach(i => i.classList.remove('error')), 1500);
+                showAlert('alert-step2', 'alert-error', result.message || 'Invalid OTP. Please try again.');
+            }
+        });
+
+        // ── Resend OTP ──
+        async function resendOtp() {
+            const btn = document.getElementById('resend-btn');
+            btn.disabled = true;
+            hideAlert('alert-step2');
+
+            const result = await register(currentName, currentEmail, currentPassword);
+
+            if (result.success) {
+                showAlert('alert-step2', 'alert-success', 'A new code has been sent!');
+            } else {
+                showAlert('alert-step2', 'alert-error', result.message || 'Failed to resend code.');
+            }
+
+            // Cooldown 60s
+            let countdown = 60;
+            btn.textContent = `Resend (${countdown}s)`;
+            const timer = setInterval(() => {
+                countdown--;
+                btn.textContent = `Resend (${countdown}s)`;
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.textContent = 'Resend';
+                }
+            }, 1000);
+        }
+    </script>
+    <style>
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+    </style>
+    </script>
+    </div>
+</body>
+</html>
