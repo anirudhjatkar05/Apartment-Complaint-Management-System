@@ -104,7 +104,7 @@ Example:
 ```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=12345678
+DB_PASSWORD=your_password
 DB_NAME=complaint_db
 PORT=5000
 ```
