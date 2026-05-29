@@ -5,8 +5,8 @@
     --text-primary: #0f172a;
     --text-secondary: #475569;
     --accent-primary: #2563eb;
-    --accent-secondary: #4f46e5;
-    --accent-tertiary: #3b82f6;
+    --accent-secondary: #a8a4ec;
+    --accent-tertiary: #586f95;
     
     --card-bg: #ffffff;
     --border-light: #e2e8f0;
@@ -772,7 +772,7 @@ input.success { border-color: var(--success) !important; }
 
 .sidebar {
     width: 280px;
-    background: rgba(15, 23, 42, 0.4);
+    background: rgb(39, 223, 223);
     backdrop-filter: blur(30px);
     border-right: 1px solid var(--glass-border);
     display: flex;
@@ -858,7 +858,7 @@ input.success { border-color: var(--success) !important; }
     display: block;
     font-size: 1.8rem;
     font-weight: 800;
-    color: #fff;
+    color: #000000;
     line-height: 1.2;
 }
 
